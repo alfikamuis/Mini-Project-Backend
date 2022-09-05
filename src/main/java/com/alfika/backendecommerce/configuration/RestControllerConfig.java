@@ -11,6 +11,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 @Configuration
 public class RestControllerConfig implements RepositoryRestConfigurer {
 
+    /*
     //disable method POST,PUT,DELETE for product and product_category
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
@@ -25,4 +26,6 @@ public class RestControllerConfig implements RepositoryRestConfigurer {
                 .withItemExposure(((metdata, httpMethods) -> httpMethods.disable(dissableActions)))
                 .withCollectionExposure(((metdata, httpMethods) -> httpMethods.disable(dissableActions)));
     }
+
+     */
 }

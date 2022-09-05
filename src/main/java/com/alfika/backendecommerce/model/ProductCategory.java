@@ -16,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "product_category")
-public class ProductCategory implements Serializable {
+public class ProductCategory implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -31,4 +31,5 @@ public class ProductCategory implements Serializable {
             cascade = CascadeType.ALL,
             mappedBy = "categoryId")
     private Set<Product> products;
+
 }

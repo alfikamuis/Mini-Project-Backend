@@ -17,7 +17,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Entity
 @Table(name = "order_item")
-public class Cart implements Serializable {
+public class Cart implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class Cart implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    private Customer CustomerId;
+    private Customer customerId;
 
     @Column(name = "quantity")
     private Double quantity;
