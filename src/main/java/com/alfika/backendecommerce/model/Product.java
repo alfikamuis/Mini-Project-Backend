@@ -1,57 +1,63 @@
 package com.alfika.backendecommerce.model;
 
+import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
 @Entity
-@Table(name = "product")
-public class Product implements Serializable {
+@Table(name = "products")
+public class Product{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
+    @NotNull
     private String name;
 
-    @Column(name = "description")
+    @NotNull
     private String description;
-
-    @Column(name = "unit_price")
-    private BigDecimal unitPrice;
-
-    @Column(name = "image_url")
-    private String imageUrl;
-
-    @Column(name = "active")
-    private boolean active;
 
     @Column(name = "unit_stock")
     private int unitStock;
 
+    @Column(name = "unit_price")
+    private double unitPrice;
+
+    @Lob
+    @Column(name = "image_url")
+    private byte[] imageUrl;
+
+    //@ManyToOne
+    //@JoinColumn (name = "category_id",nullable = false)
+    //@JoinColumn(name = "category_id")
+    //private String category;
+
+    //date auto create
+    @Basic(optional = false)
     @CreationTimestamp
     @Column(name = "created_at")
-    private Date createdAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt = new Date(); // initialize created date
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Date updatedAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updatedAt = new Date(); // initialize updated date
 
-    //relation to table product_category
-    @ManyToOne
-    @JoinColumn(name = "category_id",nullable = false)
-    private ProductCategory categoryId;
+    @PreUpdate
+    public void setUpdatedAt() {
+        this.updatedAt= new Date();
+    }
 
 }

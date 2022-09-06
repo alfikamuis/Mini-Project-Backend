@@ -21,28 +21,27 @@ public class Cart implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product productId;
+    @Column(name = "order_id",nullable = true)
+    private int orderId;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
-    private Customer customerId;
+    private String email;
 
-    @Column(name = "quantity")
-    private Double quantity;
+    private String name;
 
-    @Column(name = "price")
-    private BigDecimal price;
+    private int quantity;
 
-    @Column(name = "total_price")
-    private BigDecimal totalPrice;
+    private double price;
 
-    @CreationTimestamp
     @Column(name = "created_at")
     private Date createdAt;
 
+    @ManyToOne
+    @JoinColumn
+    private Product productId;
+
+    @ManyToOne
+    @JoinColumn
+    private User userId;
 }
