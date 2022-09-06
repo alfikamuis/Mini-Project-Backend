@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter
@@ -24,7 +22,7 @@ public class Cart implements Serializable{
     private Long id;
 
     @Column(name = "order_id",nullable = true)
-    private int orderId;
+    private Long orderId;
 
     private String email;
 
@@ -37,11 +35,8 @@ public class Cart implements Serializable{
     @Column(name = "created_at")
     private Date createdAt;
 
-    @ManyToOne
-    @JoinColumn
-    private Product productId;
+    // one to many
+    @Column(name = "product_id")
+    private Long productId;
 
-    @ManyToOne
-    @JoinColumn
-    private User userId;
 }

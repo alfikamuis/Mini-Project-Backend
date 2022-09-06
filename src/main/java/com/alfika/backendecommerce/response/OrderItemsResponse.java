@@ -19,4 +19,7 @@ public class OrderItemsResponse {
 
     public OrderItemsResponse(String message, Optional<OrderItems> orderItems) {
     }
+
+    public OrderItemsResponse(String statusOrder) {
+    }
 }

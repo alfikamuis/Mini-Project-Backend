@@ -8,6 +8,7 @@ import com.alfika.backendecommerce.response.OrderItemsResponse;
 import com.alfika.backendecommerce.response.ViewOrderResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin")
+@PreAuthorize("hasRole('ADMIN')")
 public class OrderAdminController {
 
     @Autowired

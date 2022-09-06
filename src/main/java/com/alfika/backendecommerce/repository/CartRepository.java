@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CartRepository extends JpaRepository<Cart,Long> {
@@ -12,9 +13,9 @@ public interface CartRepository extends JpaRepository<Cart,Long> {
     List<Cart> findAllById(Long Id);
     List<Cart> findByEmail(String email);
     boolean existsById(Long productId);
-    Cart findById(int cartId);
-    Cart findByIdAndEmail(int cartId,String email);
-    void deleteByIdAndEmail(int cartId,String email);
+    Optional<Cart> findById(Long id);
+    Cart findByIdAndEmail(Long id,String email);
+    void deleteByIdAndEmail(Long id,String email);
     List<Cart> findAllByEmail(String email);
 
 }
