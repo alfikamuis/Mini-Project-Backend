@@ -32,11 +32,6 @@ import java.util.List;
 public class ProductUserController {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private CartRepository cartRepository;
-    @Autowired
     private ProductRepository productRepository;
 
 
@@ -46,19 +41,4 @@ public class ProductUserController {
         return productRepository.findAll(pageRequest);
     }
 
-    //get the user data via auth
-    public User getCurrentUser(Principal currentUser){
-
-        String username = currentUser.getName();
-        User theUser =new User();
-
-        if(theUser!=null){
-            theUser = userRepository
-                    .findByUsername(username)
-                    .orElseThrow(() -> new UsernameNotFoundException(
-                            "Username <"+ username+"> Not Found!!")
-                    );
-        }
-        return theUser;
-    }
 }

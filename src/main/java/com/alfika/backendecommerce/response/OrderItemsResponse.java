@@ -22,6 +22,10 @@ public class OrderItemsResponse {
         this.orderItems = orderItems;
     }
 
+    public OrderItemsResponse(String message, List<OrderItems> orderItemsList) {
+        this.message = message;
+        this.orderItemsList = orderItemsList;
+    }
     public OrderItemsResponse(String message) {
         this.message = message;
     }

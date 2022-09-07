@@ -1,4 +1,4 @@
-package com.alfika.backendecommerce.controller;
+package com.alfika.backendecommerce.controller.auth;
 
 import com.alfika.backendecommerce.dto.SignUpDTO;
 import com.alfika.backendecommerce.model.ERole;
@@ -43,12 +43,8 @@ public class SignUpController {
         }
 
         //Create User's Account
-        User user=new User(
-                signUpDTO.getUsername(),
-                signUpDTO.getEmail(),
-                signUpDTO.getAddress(),
+        User user=new User(signUpDTO.getUsername(), signUpDTO.getEmail(), signUpDTO.getAddress(),
                 encoder.encode(signUpDTO.getPassword())
-
         );
 
         //default signIn record as User
@@ -82,9 +78,7 @@ public class SignUpController {
         user.setRoles(roles);
         userRepository.save(user);
         return ResponseEntity.ok(new SignUpResponse(
-                "User <"+user.getUsername()
-                        +"> email: <"+user.getEmail()
-                        +"> registered!"));
+                "User <"+user.getUsername() +"> email: <"+user.getEmail() +"> registered!"));
 
     }
 }

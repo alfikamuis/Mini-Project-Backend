@@ -2,18 +2,15 @@ package com.alfika.backendecommerce.controller.admin;
 
 import com.alfika.backendecommerce.model.OrderItems;
 import com.alfika.backendecommerce.model.ViewOrder;
-import com.alfika.backendecommerce.repository.CartRepository;
-import com.alfika.backendecommerce.repository.OrderItemsRepository;
 import com.alfika.backendecommerce.response.OrderItemsResponse;
 import com.alfika.backendecommerce.response.ViewOrderResponse;
+import com.alfika.backendecommerce.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -21,26 +18,24 @@ import java.util.Optional;
 public class OrderAdminController {
 
     @Autowired
-    private OrderItemsRepository orderItemsRepository;
-    @Autowired
-    private CartRepository cartRepository;
+    private AdminService adminService;
 
     @GetMapping("/view-orders")
     public ResponseEntity<?> getAllOrders(){
-        List<ViewOrder> viewOrdersArr = new ArrayList<>();
-        List<OrderItems> orderItems = orderItemsRepository.findAll(); //fetch data from order_items db
-
-        orderItems.forEach((items) ->{
-            ViewOrder toViewOrder = new ViewOrder();
-            toViewOrder.setOrderId(items.getId());
-            toViewOrder.setOrderBy(items.getEmail());
-            toViewOrder.setOrderStatus(items.getOrderStatus());
-            toViewOrder.setProducts(cartRepository.findAllById(items.getId()));
-            viewOrdersArr.add(toViewOrder);
-        });
+        List<ViewOrder> viewOrder = adminService.viewAllOrderByUser();
         return ResponseEntity.ok(new ViewOrderResponse(
-                "All list Order", viewOrdersArr
+                "All list Order", viewOrder
         ));
+    }
+
+    @GetMapping("/view-pending-order")
+    public ResponseEntity<?> updatePendingOrder(
+            @RequestParam(name="id") Long id,
+            @RequestParam(name="status") String status)
+    {
+        List<OrderItems> orderItems = adminService.updateStatusPendingOrder(id,status);
+        return ResponseEntity.ok(new OrderItemsResponse(
+                "status order id: "+ id +" has been updated", orderItems));
     }
 
     @PostMapping("/update-order")
@@ -48,12 +43,9 @@ public class OrderAdminController {
             @RequestParam(name="id") Long id,
             @RequestParam(name="status") String status)
     {
-        Optional<OrderItems> orderItems = orderItemsRepository.findById(id);
-        OrderItems theOrderItems = orderItems.get();
-        theOrderItems.setOrderStatus(status);
-        orderItemsRepository.save(theOrderItems);
+        OrderItems orderItems = adminService.updateStatusOrder(id,status);
         return ResponseEntity.ok(new OrderItemsResponse(
-                "status order id: "+ id +" has been updated", theOrderItems));
+                "status order id: "+ id +" has been updated", orderItems));
     }
 
 

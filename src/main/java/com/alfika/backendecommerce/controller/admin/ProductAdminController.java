@@ -1,10 +1,8 @@
 package com.alfika.backendecommerce.controller.admin;
 
-import com.alfika.backendecommerce.dto.ProductDTO;
 import com.alfika.backendecommerce.model.Product;
-import com.alfika.backendecommerce.repository.ProductRepository;
 import com.alfika.backendecommerce.response.ProductResponse;
-import com.alfika.backendecommerce.service.admin.ProductAdminService;
+import com.alfika.backendecommerce.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Optional;
 
 
 @RestController
@@ -23,13 +20,13 @@ import java.util.Optional;
 public class ProductAdminController {
 
     @Autowired
-    private ProductAdminService productAdminService;
+    private AdminService adminService;
 
     @GetMapping("/get-product")
     public ResponseEntity<?> getProducts(){
         return ResponseEntity.ok(new ProductResponse(
                 "Products find",
-                productAdminService.findAllProduct()
+                adminService.findAllProduct()
         ));
     }
 
@@ -43,9 +40,9 @@ public class ProductAdminController {
             //@RequestParam(name="category") String category
     ) throws IOException {
 
+        Product product = adminService.addProduct(name,description,stock,price,imageUrl);
         return ResponseEntity.ok(new ProductResponse(
-                "Product created.",
-                productAdminService.addProduct(name,description,stock,price,imageUrl)
+                "Product created.",product
         ));
     }
 
@@ -60,7 +57,7 @@ public class ProductAdminController {
             //@RequestParam(name="category") String category
     ) throws IOException{
 
-        Product product = productAdminService.updateProduct(id,name,description,stock,price,imageUrl );
+        Product product = adminService.updateProduct(id,name,description,stock,price,imageUrl );
         return ResponseEntity.ok(new ProductResponse(
                 "update product id:" + id, product));
     }
@@ -68,10 +65,9 @@ public class ProductAdminController {
     @DeleteMapping("/delete-product")
     @Transactional
     public ResponseEntity<?> deleteProduct(@RequestParam (name ="id") Long id){
-        productRepository.deleteById(id);
+        adminService.deleteProduct(id);
         return ResponseEntity.ok(new ProductResponse(
-                "Delete Product id:"+ id,
-                productRepository.findAll()
+                "Delete Product id:"+ id, adminService.findAllProduct()
         ));
     }
 

@@ -1,4 +1,4 @@
-package com.alfika.backendecommerce.controller;
+package com.alfika.backendecommerce.controller.auth;
 
 import com.alfika.backendecommerce.configuration.JwtUtils;
 import com.alfika.backendecommerce.dto.LoginDTO;

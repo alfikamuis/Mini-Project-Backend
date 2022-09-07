@@ -17,5 +17,8 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     @Procedure(value = "INVENTORY_CHECK")
     boolean checkInventory (Long id, Integer quantity);
 
+    @Procedure(value = "INVENTORY_ADD_FROM_DEL_CART")
+    boolean addInventoryFromCart (Long id, Integer quantity);
+
 }
 
