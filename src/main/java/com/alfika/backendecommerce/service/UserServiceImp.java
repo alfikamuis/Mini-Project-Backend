@@ -1,6 +1,5 @@
 package com.alfika.backendecommerce.service;
 
-import com.alfika.backendecommerce.dto.ProductDTO;
 import com.alfika.backendecommerce.model.Cart;
 import com.alfika.backendecommerce.model.OrderItems;
 import com.alfika.backendecommerce.model.Product;
@@ -35,7 +34,7 @@ public class UserServiceImp implements UserService{
     @Override
     public List<Cart> viewCartUser(Principal currentUser) {
         User user = getCurrentUser(currentUser);
-        return cartRepository.findByEmailAndIncart(user.getEmail(),true);
+        return cartRepository.findByEmailAndStatus(user.getEmail(),true);
     }
 
     @Override
@@ -45,7 +44,7 @@ public class UserServiceImp implements UserService{
         cart.setPrice(cart.getPrice()); //update quantity should be change price?
         cart.setQuantity(quantity);
         cartRepository.save(cart);
-        return cartRepository.findByEmailAndIncart(user.getEmail(),true);
+        return cartRepository.findByEmailAndStatus(user.getEmail(),true);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class UserServiceImp implements UserService{
 
         return ResponseEntity.ok(new CartResponse(
                 "the product "+ cart.getName()+" has been saved in your cart",
-                cartRepository.findByEmailAndIncart(user.getEmail(),true)
+                cartRepository.findByEmailAndStatus(user.getEmail(),true)
         ));
     }
 
@@ -91,7 +90,7 @@ public class UserServiceImp implements UserService{
         productRepository.addInventoryFromCart(cart.getProductId(), cart.getQuantity());
         cartRepository.deleteByIdAndEmail(cartId, user.getEmail());
 
-        return cartRepository.findByEmailAndIncart(user.getEmail(),true);
+        return cartRepository.findByEmailAndStatus(user.getEmail(),true);
     }
 
     @Override
@@ -109,14 +108,14 @@ public class UserServiceImp implements UserService{
 
         //sum total by findAll product in cart
         double total=0;
-        List<Cart> carts = cartRepository.findByEmailAndIncart(user.getEmail(),true);
+        List<Cart> carts = cartRepository.findByEmailAndStatus(user.getEmail(),true);
         for(Cart cart: carts){
             total += cart.getQuantity() * cart.getPrice();
-            cart.setInCart(false);
+            cart.setStatus(false);
         }
         orderItems.setTotalCost(total);
 
-        //save to cart
+        //save to order_items db
         OrderItems theList = orderItemsRepository.save(orderItems);
         carts.forEach(items->{ items.setOrderId(theList.getId());
             cartRepository.save(items);

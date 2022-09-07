@@ -28,8 +28,8 @@ public class Cart{
     private int quantity;
     private double price;
 
-    @Column(name = "in_cart")
-    private boolean inCart = true;
+    @Column(name = "status")
+    private boolean status = true;
     // one to many
     @Column(name = "product_id")
     private Long productId;
