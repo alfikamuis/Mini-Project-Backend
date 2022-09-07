@@ -49,10 +49,11 @@ public class OrderAdminController {
             @RequestParam(name="status") String status)
     {
         Optional<OrderItems> orderItems = orderItemsRepository.findById(id);
-        orderItems.get().setOrderStatus(status);
-        orderItemsRepository.save(orderItems.get());
+        OrderItems theOrderItems = orderItems.get();
+        theOrderItems.setOrderStatus(status);
+        orderItemsRepository.save(theOrderItems);
         return ResponseEntity.ok(new OrderItemsResponse(
-                "status order id: "+ id +" has been updated", orderItems));
+                "status order id: "+ id +" has been updated", theOrderItems));
     }
 
 

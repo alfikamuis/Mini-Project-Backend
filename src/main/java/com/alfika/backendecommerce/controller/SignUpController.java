@@ -46,7 +46,9 @@ public class SignUpController {
         User user=new User(
                 signUpDTO.getUsername(),
                 signUpDTO.getEmail(),
+                signUpDTO.getAddress(),
                 encoder.encode(signUpDTO.getPassword())
+
         );
 
         //default signIn record as User
@@ -82,7 +84,7 @@ public class SignUpController {
         return ResponseEntity.ok(new SignUpResponse(
                 "User <"+user.getUsername()
                         +"> email: <"+user.getEmail()
-                        +"registered!"));
+                        +"> registered!"));
 
     }
 }
