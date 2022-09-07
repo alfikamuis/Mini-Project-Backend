@@ -1,0 +1,21 @@
+package com.alfika.backendecommerce.repository;
+
+import com.alfika.backendecommerce.model.Product;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+//@RepositoryRestResource(collectionResourceRel = "product", path = "products")
+public interface ProductRepository extends JpaRepository<Product,Long> {
+
+    Optional<Product> findById(Long id);
+    void deleteById(Long id);
+
+    @Procedure(value = "INVENTORY_CHECK")
+    boolean checkInventory (Long id, Integer quantity);
+
+}
+
