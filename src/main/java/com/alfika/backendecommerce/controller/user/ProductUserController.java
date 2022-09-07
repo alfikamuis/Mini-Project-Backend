@@ -12,6 +12,8 @@ import com.alfika.backendecommerce.response.CartResponse;
 import com.alfika.backendecommerce.response.OrderItemsResponse;
 import com.alfika.backendecommerce.response.ProductResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -33,51 +35,15 @@ public class ProductUserController {
     private UserRepository userRepository;
 
     @Autowired
-    private OrderItemsRepository orderItemsRepository;
-    @Autowired
     private CartRepository cartRepository;
     @Autowired
     private ProductRepository productRepository;
 
 
     @GetMapping("/get-product")
-    public ResponseEntity<?> getAllProduct(){
-        return ResponseEntity.ok(new ProductResponse(
-                "Happy shopping",
-                productRepository.findAll()));
-    }
-
-
-    @GetMapping("/order_items")
-    public ResponseEntity<?> orderedItems(Principal currentUser){
-        User user = getCurrentUser(currentUser);
-
-        //use email for future auth or send the order to the email
-        OrderItems orderItems = new OrderItems();
-        orderItems.setEmail(user.getEmail());
-        orderItems.setOrderStatus("pending");
-
-        //save the order's date
-        Date date=new Date();
-        orderItems.setOrderDate(date);
-
-        //sum total
-        double total=0;
-        List<Cart> carts = cartRepository.findAllByEmail(user.getEmail());
-        for(Cart cart: carts){
-            total=cart.getQuantity() * cart.getPrice();
-        }
-        orderItems.setTotalCost(total);
-
-        //save to cart
-        OrderItems thelist = orderItemsRepository.save(orderItems);
-        carts.forEach(items->{
-            items.setOrderId(thelist.getId());
-            cartRepository.save(items);
-        });
-
-        return ResponseEntity.ok(new OrderItemsResponse(
-                "Shipping out your order, please wait for admin evaluations"));
+    public Page<Product> getAllProduct(@RequestParam int page, @RequestParam int size){
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return productRepository.findAll(pageRequest);
     }
 
     //get the user data via auth
@@ -87,7 +53,7 @@ public class ProductUserController {
         User theUser =new User();
 
         if(theUser!=null){
-            theUser=userRepository
+            theUser = userRepository
                     .findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException(
                             "Username <"+ username+"> Not Found!!")

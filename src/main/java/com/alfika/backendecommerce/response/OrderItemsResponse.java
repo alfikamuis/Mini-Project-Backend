@@ -14,12 +14,15 @@ import java.util.Optional;
 public class OrderItemsResponse {
 
     private String message;
-    private List<OrderItems> placeOrderist;
-    private OrderItems placeOrder;
+    private List<OrderItems> orderItemsList;
+    private OrderItems orderItems;
 
-    public OrderItemsResponse(String message, Optional<OrderItems> orderItems) {
+    public OrderItemsResponse(String message, OrderItems orderItems) {
+        this.message = message;
+        this.orderItems = orderItems;
     }
 
-    public OrderItemsResponse(String statusOrder) {
+    public OrderItemsResponse(String message) {
+        this.message = message;
     }
 }

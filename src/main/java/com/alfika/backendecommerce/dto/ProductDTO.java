@@ -9,4 +9,8 @@ public class ProductDTO {
     private String price;
     private String quantity;
     private MultipartFile productimage;
+
+    public ProductDTO() {
+
+    }
 }

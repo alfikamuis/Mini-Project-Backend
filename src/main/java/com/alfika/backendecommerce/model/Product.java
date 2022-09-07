@@ -61,4 +61,11 @@ public class Product{
         this.updatedAt= new Date();
     }
 
+    public Product(String name, String description, int stock, String price) {
+        this.name = name;
+        this.description = description;
+        this.unitStock = stock;
+        this.unitPrice = Double.parseDouble(price);
+    }
+
 }

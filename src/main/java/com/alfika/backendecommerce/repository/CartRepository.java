@@ -14,6 +14,7 @@ public interface CartRepository extends JpaRepository<Cart,Long> {
     List<Cart> findByEmail(String email);
     boolean existsById(Long productId);
     Optional<Cart> findById(Long id);
+    Cart findById(int id);
     Cart findByIdAndEmail(Long id,String email);
     void deleteByIdAndEmail(Long id,String email);
     List<Cart> findAllByEmail(String email);

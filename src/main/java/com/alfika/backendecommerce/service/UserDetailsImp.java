@@ -15,13 +15,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter @Setter
-@AllArgsConstructor @NoArgsConstructor
+@NoArgsConstructor @AllArgsConstructor
 public class UserDetailsImp implements UserDetails {
 
     private Long id;
     private String username;
     private String email;
-
     @JsonIgnore
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
@@ -40,22 +39,37 @@ public class UserDetailsImp implements UserDetails {
     }
 
     @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

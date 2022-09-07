@@ -4,6 +4,7 @@ import com.alfika.backendecommerce.dto.ProductDTO;
 import com.alfika.backendecommerce.model.Product;
 import com.alfika.backendecommerce.repository.ProductRepository;
 import com.alfika.backendecommerce.response.ProductResponse;
+import com.alfika.backendecommerce.service.admin.ProductAdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,13 +23,13 @@ import java.util.Optional;
 public class ProductAdminController {
 
     @Autowired
-    private ProductRepository productRepository;
+    private ProductAdminService productAdminService;
 
     @GetMapping("/get-product")
     public ResponseEntity<?> getProducts(){
         return ResponseEntity.ok(new ProductResponse(
                 "Products find",
-                productRepository.findAll()
+                productAdminService.findAllProduct()
         ));
     }
 
@@ -42,18 +43,9 @@ public class ProductAdminController {
             //@RequestParam(name="category") String category
     ) throws IOException {
 
-        Product product = new Product();
-        product.setName(name);
-        product.setDescription(description);
-        product.setUnitStock(Integer.parseInt(stock));
-        product.setUnitPrice(Double.parseDouble(price));
-        product.setImageUrl(imageUrl.getBytes());
-        //product.setCategory(category);
-        productRepository.save(product);
-
-        ProductDTO productDTO = new ProductDTO();
         return ResponseEntity.ok(new ProductResponse(
-                "Product created.",product
+                "Product created.",
+                productAdminService.addProduct(name,description,stock,price,imageUrl)
         ));
     }
 
@@ -68,26 +60,9 @@ public class ProductAdminController {
             //@RequestParam(name="category") String category
     ) throws IOException{
 
-        Optional<Product> product1 = productRepository.findById(id);
-        Optional<Product> productOriginal = productRepository.findById(id);
-        if(!imageUrl.isEmpty()){
-            product1.get().setName(name);
-            product1.get().setDescription(description);
-            product1.get().setUnitPrice(Double.parseDouble(price));
-            product1.get().setUnitStock(Integer.parseInt(stock));
-            product1.get().setImageUrl(imageUrl.getBytes());
-        }
-        else{
-            product1.get().setName(name);
-            product1.get().setDescription(description);
-            product1.get().setUnitPrice(Double.parseDouble(price));
-            product1.get().setUnitStock(Integer.parseInt(stock));
-            product1.get().setImageUrl(productOriginal.get().getImageUrl());
-
-        }
-        productRepository.save(product1.get());
+        Product product = productAdminService.updateProduct(id,name,description,stock,price,imageUrl );
         return ResponseEntity.ok(new ProductResponse(
-                "update product id:" + id, product1.get()));
+                "update product id:" + id, product));
     }
 
     @DeleteMapping("/delete-product")
