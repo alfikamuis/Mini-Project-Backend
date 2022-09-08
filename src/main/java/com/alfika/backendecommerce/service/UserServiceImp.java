@@ -37,27 +37,53 @@ public class UserServiceImp implements UserService{
         return cartRepository.findByEmailAndStatusTrue(user.getEmail());
     }
 
+    //--------------------------------------------------------------------update cart-------
+
     @Override
-    public List<Cart> updateQuantityInCart(Long id, int quantity,Principal currentUser) {
+    public ResponseEntity<?> updateQuantityInCart(Long id, int quantity,Principal currentUser) {
+
+        if(!cartRepository.findById(id).isPresent()){
+            return ResponseEntity.badRequest().body(new CartResponse("cart by id not found!"));
+        }
+
         User user = getCurrentUser(currentUser);
         Cart cart = cartRepository.findByIdAndEmail(id, user.getEmail());
-        cart.setPrice(cart.getPrice()); //update quantity should be change price?
+
+        //change quantity
+        Optional<Product> fetchProduct = productRepository.findById(cart.getProductId());
+        Product product = fetchProduct.get();
+        //check if the condition meets the quantity of product
+        if( product.getUnitStock() - quantity < 0|| quantity > product.getUnitStock()){
+            return ResponseEntity.badRequest().body(new CartResponse("stock product not available!"));
+        }
+        if(cart.getQuantity() < quantity){
+            product.setUnitStock(product.getUnitStock() - (quantity- cart.getQuantity()));
+        } else {
+            product.setUnitStock(product.getUnitStock() + (cart.getQuantity()-quantity));
+        }
+        productRepository.save(product);
+
+        cart.setPrice(cart.getPrice());
         cart.setQuantity(quantity);
         cartRepository.save(cart);
-        return cartRepository.findByEmailAndStatusTrue(user.getEmail());
+
+        return ResponseEntity.ok(new CartResponse("quantity changes ",
+                cartRepository.findByEmailAndStatusTrue(user.getEmail())
+        ));
     }
 
-    //--------------------------------------------------------------------add product-------
+    //--------------------------------------------------------------------add cart-----------
 
     @Override
     public ResponseEntity<?> addProductToCart(Long id, int quantity, Principal currentUser) {
+
+        if(!productRepository.findById(id).isPresent()){
+            return ResponseEntity.badRequest().body(new CartResponse("product by id not found!"));
+        }
+
         User user = getCurrentUser(currentUser);
         Optional<Product> fetchProduct = productRepository.findById(id);
         Product product = fetchProduct.get();
-
-        if(fetchProduct.isPresent()){
-            return ResponseEntity.badRequest().body(new CartResponse("product by id not found!"));
-        }
 
         //check if found duplicate item in cart <optional>
         if(cartRepository.existsByProductIdAndStatusTrue(id)){
@@ -66,7 +92,7 @@ public class UserServiceImp implements UserService{
 
         //int inventory = productRepository.checkInventory(id,quantity);
         //check if the condition meets the quantity of product
-        if( product.getUnitStock() - quantity < 0){
+        if( product.getUnitStock() - quantity < 0|| quantity > product.getUnitStock()){
             return ResponseEntity.badRequest().body(new CartResponse("stock product not available!"));
         }
 
@@ -90,8 +116,13 @@ public class UserServiceImp implements UserService{
         ));
     }
 
+    //--------------------------------------------------------------------delete cart-------
     @Override
-    public List<Cart> deleteProductInCart(Long cartId, Principal currentUser) {
+    public ResponseEntity<?> deleteProductInCart(Long cartId, Principal currentUser) {
+
+        if(!cartRepository.findById(cartId).isPresent()){
+            return ResponseEntity.badRequest().body(new CartResponse("cart by id not found!"));
+        }
         User user = getCurrentUser(currentUser);
         Optional<Cart> fetchCart = cartRepository.findById(cartId);
         Cart cart = fetchCart.get();
@@ -99,16 +130,20 @@ public class UserServiceImp implements UserService{
         //return quantity
         Optional<Product> fetchProduct = productRepository.findById(cart.getProductId());
         Product product = fetchProduct.get();
-        product.setUnitStock(product.getUnitStock()+ cart.getQuantity());
+        product.setUnitStock(product.getUnitStock() + cart.getQuantity());
         productRepository.save(product);
 
         //return quantity to the db and delete it
         //productRepository.addInventoryFromCart(cart.getProductId(), cart.getQuantity());
         cartRepository.deleteByIdAndEmail(cartId, user.getEmail());
 
-        return cartRepository.findByEmailAndStatusTrue(user.getEmail());
+        return ResponseEntity.ok(new CartResponse("cart id:"+ cartId +" items deleted",
+                cartRepository.findByEmailAndStatusTrue(user.getEmail())
+        ));
     }
 
+
+    //--------------------------------------------------------------------approve order-------
     @Override
     public OrderItems orderApprovedByUser(Principal currentUser) {
         User user = getCurrentUser(currentUser);

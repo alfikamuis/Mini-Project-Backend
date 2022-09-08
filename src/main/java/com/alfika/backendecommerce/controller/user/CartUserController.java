@@ -36,9 +36,7 @@ public class CartUserController {
             @RequestParam("id") Long id, @RequestParam("quantity")int quantity,
             Principal currentUser){
 
-        List<Cart> carts = userService.updateQuantityInCart(id,quantity,currentUser);
-        return ResponseEntity.ok(new CartResponse("quantity and price changes ", carts
-        ));
+        return userService.updateQuantityInCart(id,quantity,currentUser);
     }
 
     @GetMapping("/add-to-cart")
@@ -53,9 +51,7 @@ public class CartUserController {
     @Transactional
     public ResponseEntity<?> deleteCart( @RequestParam("cartId") Long id, Principal currentUser){
 
-        return ResponseEntity.ok(new CartResponse("cart id:"+id+" items deleted",
-                userService.deleteProductInCart(id,currentUser)
-        ));
+        return userService.deleteProductInCart(id,currentUser);
     }
 
     @GetMapping("/order_items")
@@ -63,7 +59,7 @@ public class CartUserController {
         OrderItems orderItems  = userService.orderApprovedByUser(currentUser);
 
         if (orderItems.getTotalCost() == 0){
-            return ResponseEntity.ok(new OrderItemsResponse("your cart empty"));
+            return ResponseEntity.ok(new OrderItemsResponse("your cart is empty"));
         }
         return ResponseEntity.ok(new OrderItemsResponse(
                 "Shipping out your order, check status regularly", orderItems));

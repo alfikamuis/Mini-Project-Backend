@@ -16,5 +16,6 @@ public class ViewOrder {
     private Long orderId;
     private String orderBy;
     private String orderStatus;
+    private double totalOrders;
     private List<Cart> products = new ArrayList<>();
 }

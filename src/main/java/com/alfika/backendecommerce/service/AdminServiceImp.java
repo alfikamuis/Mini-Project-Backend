@@ -6,7 +6,10 @@ import com.alfika.backendecommerce.model.ViewOrder;
 import com.alfika.backendecommerce.repository.CartRepository;
 import com.alfika.backendecommerce.repository.OrderItemsRepository;
 import com.alfika.backendecommerce.repository.ProductRepository;
+import com.alfika.backendecommerce.response.CartResponse;
+import com.alfika.backendecommerce.response.OrderItemsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,12 +38,14 @@ public class AdminServiceImp implements AdminService {
         List<ViewOrder> viewOrdersArr = new ArrayList<>();
         List<OrderItems> orderItems = orderItemsRepository.findAll(); //fetch data from order_items db
 
+
         orderItems.forEach((items) ->{
             ViewOrder toViewOrder = new ViewOrder();
             toViewOrder.setOrderId(items.getId());
             toViewOrder.setOrderBy(items.getEmail());
             toViewOrder.setOrderStatus(items.getOrderStatus());
-            toViewOrder.setProducts(cartRepository.findAllById(items.getId()));
+            toViewOrder.setTotalOrders(items.getTotalCost());
+            toViewOrder.setProducts(cartRepository.findByOrderId(items.getId()));
             viewOrdersArr.add(toViewOrder);
         });
         return viewOrdersArr;
@@ -56,12 +61,18 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
-    public OrderItems updateStatusOrder(Long id,String status) {
+    public ResponseEntity<?> updateStatusOrder(Long id,String status) {
+
+        if (!orderItemsRepository.existsById(id)){
+            return ResponseEntity.badRequest().body(new OrderItemsResponse("order id not found"));
+        }
         Optional<OrderItems> orderItems = orderItemsRepository.findById(id);
         OrderItems items = orderItems.get();
         items.setOrderStatus(status);
         orderItemsRepository.save(items);
-        return items;
+
+        return ResponseEntity.ok(new OrderItemsResponse(
+                "status order id: "+ id +" has been updated", items));
     }
 
     @Override

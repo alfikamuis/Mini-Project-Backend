@@ -3,6 +3,7 @@ package com.alfika.backendecommerce.service;
 import com.alfika.backendecommerce.model.OrderItems;
 import com.alfika.backendecommerce.model.Product;
 import com.alfika.backendecommerce.model.ViewOrder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ public interface AdminService {
     List<ViewOrder> viewAllOrderByUser();
     List<OrderItems> viewAllShippingOrderByUser();
     List<OrderItems> viewAllPendingOrderByUser();
-    OrderItems updateStatusOrder (Long id,String message);
+    ResponseEntity<?> updateStatusOrder (Long id, String message);
     List<OrderItems> updateStatusPendingOrder (Long id,String message);
     Product addProduct(
             String name,

@@ -2,6 +2,7 @@ package com.alfika.backendecommerce.controller.admin;
 
 import com.alfika.backendecommerce.model.OrderItems;
 import com.alfika.backendecommerce.model.ViewOrder;
+import com.alfika.backendecommerce.response.CartResponse;
 import com.alfika.backendecommerce.response.OrderItemsResponse;
 import com.alfika.backendecommerce.response.ViewOrderResponse;
 import com.alfika.backendecommerce.service.AdminService;
@@ -49,9 +50,7 @@ public class OrderAdminController {
             @RequestParam(name="id") Long id,
             @RequestParam(name="status") String status)
     {
-        OrderItems orderItems = adminService.updateStatusOrder(id,status);
-        return ResponseEntity.ok(new OrderItemsResponse(
-                "status order id: "+ id +" has been updated", orderItems));
+        return adminService.updateStatusOrder(id,status);
     }
 
 
