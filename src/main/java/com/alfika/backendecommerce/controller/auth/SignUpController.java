@@ -55,9 +55,9 @@ public class SignUpController {
         );
 
         //default signIn record as User
-        Set<String> rolesfromRequest = signUpDTO.getRole();
+        Set<String> rolesFromRequest = signUpDTO.getRole();
         Set<Role> roles = new HashSet<>();
-        if(rolesfromRequest==null)
+        if(rolesFromRequest == null)
         {
             Role userRole = roleRepository.findByName(ERole.ROLE_USER)
                     .orElseThrow(()->new RuntimeException("Error! not found."));
@@ -65,16 +65,16 @@ public class SignUpController {
         }
         else
         {
-            rolesfromRequest.forEach(role ->{
+            rolesFromRequest.forEach(role ->{
                 switch (role) {
                     case "admin":
-                        Role adminRole=roleRepository.findByName(ERole.ROLE_ADMIN)
+                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
                                 .orElseThrow(()-> new RuntimeException("Error! not found."));
                         roles.add(adminRole);
                         break;
 
                     default:
-                        Role userRole=roleRepository.findByName(ERole.ROLE_USER)
+                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
                                 .orElseThrow(() -> new RuntimeException("Error! not found."));
                         roles.add(userRole);
                         break;
