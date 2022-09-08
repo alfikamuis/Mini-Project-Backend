@@ -2,6 +2,9 @@ package com.alfika.backendecommerce.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.naming.factory.SendMailFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -23,4 +26,5 @@ public class SignUpDTO {
     private Set<String> role;
 
     private String address;
+
 }

@@ -12,6 +12,8 @@ public interface AdminService {
 
     List<Product> findAllProduct();
     List<ViewOrder> viewAllOrderByUser();
+    List<OrderItems> viewAllShippingOrderByUser();
+    List<OrderItems> viewAllPendingOrderByUser();
     OrderItems updateStatusOrder (Long id,String message);
     List<OrderItems> updateStatusPendingOrder (Long id,String message);
     Product addProduct(

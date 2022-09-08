@@ -47,6 +47,15 @@ public class AdminServiceImp implements AdminService {
     }
 
     @Override
+    public List<OrderItems> viewAllPendingOrderByUser() {
+        return orderItemsRepository.findByOrderStatus("pending");
+    }
+    @Override
+    public List<OrderItems> viewAllShippingOrderByUser() {
+        return orderItemsRepository.findByOrderStatus("shipping");
+    }
+
+    @Override
     public OrderItems updateStatusOrder(Long id,String status) {
         Optional<OrderItems> orderItems = orderItemsRepository.findById(id);
         OrderItems items = orderItems.get();

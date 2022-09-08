@@ -34,7 +34,7 @@ public class UserServiceImp implements UserService{
     @Override
     public List<Cart> viewCartUser(Principal currentUser) {
         User user = getCurrentUser(currentUser);
-        return cartRepository.findByEmailAndStatus(user.getEmail(),true);
+        return cartRepository.findByEmailAndStatusTrue(user.getEmail());
     }
 
     @Override
@@ -44,8 +44,10 @@ public class UserServiceImp implements UserService{
         cart.setPrice(cart.getPrice()); //update quantity should be change price?
         cart.setQuantity(quantity);
         cartRepository.save(cart);
-        return cartRepository.findByEmailAndStatus(user.getEmail(),true);
+        return cartRepository.findByEmailAndStatusTrue(user.getEmail());
     }
+
+    //--------------------------------------------------------------------add product-------
 
     @Override
     public ResponseEntity<?> addProductToCart(Long id, int quantity, Principal currentUser) {
@@ -53,15 +55,23 @@ public class UserServiceImp implements UserService{
         Optional<Product> fetchProduct = productRepository.findById(id);
         Product product = fetchProduct.get();
 
-        //check if found duplicate item in cart <optional>
-        if(cartRepository.existsById(product.getId())){
-            return ResponseEntity.ok(new CartResponse("please update the quantity"));
+        if(fetchProduct.isPresent()){
+            return ResponseEntity.badRequest().body(new CartResponse("product by id not found!"));
         }
 
-        //check if the condition meets the quantity of product
-        if(!productRepository.checkInventory(id,quantity)){
-            return ResponseEntity.ok(new CartResponse("product not available within the quantity"));
+        //check if found duplicate item in cart <optional>
+        if(cartRepository.existsByProductIdAndStatusTrue(id)){
+            return ResponseEntity.badRequest().body(new CartResponse("duplicate item, please update quantity"));
         }
+
+        //int inventory = productRepository.checkInventory(id,quantity);
+        //check if the condition meets the quantity of product
+        if( product.getUnitStock() - quantity < 0){
+            return ResponseEntity.badRequest().body(new CartResponse("stock product not available!"));
+        }
+
+        product.setUnitStock(product.getUnitStock() - quantity);
+        productRepository.save(product);
 
         //checking the product details
         Cart cart = new Cart();
@@ -75,8 +85,8 @@ public class UserServiceImp implements UserService{
         cartRepository.save(cart);
 
         return ResponseEntity.ok(new CartResponse(
-                "the product "+ cart.getName()+" has been saved in your cart",
-                cartRepository.findByEmailAndStatus(user.getEmail(),true)
+                "the product "+ product.getName()+" has been saved in your cart",
+                cartRepository.findByEmailAndStatusTrue(user.getEmail())
         ));
     }
 
@@ -86,15 +96,21 @@ public class UserServiceImp implements UserService{
         Optional<Cart> fetchCart = cartRepository.findById(cartId);
         Cart cart = fetchCart.get();
 
+        //return quantity
+        Optional<Product> fetchProduct = productRepository.findById(cart.getProductId());
+        Product product = fetchProduct.get();
+        product.setUnitStock(product.getUnitStock()+ cart.getQuantity());
+        productRepository.save(product);
+
         //return quantity to the db and delete it
-        productRepository.addInventoryFromCart(cart.getProductId(), cart.getQuantity());
+        //productRepository.addInventoryFromCart(cart.getProductId(), cart.getQuantity());
         cartRepository.deleteByIdAndEmail(cartId, user.getEmail());
 
-        return cartRepository.findByEmailAndStatus(user.getEmail(),true);
+        return cartRepository.findByEmailAndStatusTrue(user.getEmail());
     }
 
     @Override
-    public void orderApprovedByUser(Principal currentUser) {
+    public OrderItems orderApprovedByUser(Principal currentUser) {
         User user = getCurrentUser(currentUser);
 
         //use email for future auth or send the order details to the email
@@ -108,7 +124,10 @@ public class UserServiceImp implements UserService{
 
         //sum total by findAll product in cart
         double total=0;
-        List<Cart> carts = cartRepository.findByEmailAndStatus(user.getEmail(),true);
+        List<Cart> carts = cartRepository.findByEmailAndStatusTrue(user.getEmail());
+        if(carts.isEmpty()){
+            return orderItems;
+        }
         for(Cart cart: carts){
             total += cart.getQuantity() * cart.getPrice();
             cart.setStatus(false);
@@ -120,13 +139,14 @@ public class UserServiceImp implements UserService{
         carts.forEach(items->{ items.setOrderId(theList.getId());
             cartRepository.save(items);
         });
+        return orderItems;
     }
 
     //get the user data via auth
     public User getCurrentUser(Principal currentUser){
 
         String username = currentUser.getName();
-        User theUser =new User();
+        User theUser = new User();
         if(theUser!=null){
             theUser = userRepository
                     .findByUsername(username)

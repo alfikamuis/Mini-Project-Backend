@@ -8,12 +8,11 @@ import com.alfika.backendecommerce.repository.RoleRepository;
 import com.alfika.backendecommerce.repository.UserRepository;
 import com.alfika.backendecommerce.response.SignUpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashSet;
@@ -32,8 +31,13 @@ public class SignUpController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(
-            @Valid @RequestBody SignUpDTO signUpDTO){
+            @Valid @RequestBody SignUpDTO signUpDTO,
+            Errors errors) {
 
+        if (errors.hasErrors()) {
+            //return new ResponseEntity("please input proper e-mail", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(new SignUpResponse("please input proper e-mail"));
+        }
         //check duplication of username and email
         if(userRepository.existsByUsername(signUpDTO.getUsername())) {
             return ResponseEntity.badRequest().body(new SignUpResponse("Error: Username is already taken!"));
@@ -43,8 +47,11 @@ public class SignUpController {
         }
 
         //Create User's Account
-        User user=new User(signUpDTO.getUsername(), signUpDTO.getEmail(), signUpDTO.getAddress(),
-                encoder.encode(signUpDTO.getPassword())
+        User user = new User(
+                signUpDTO.getUsername(),
+                signUpDTO.getEmail(),
+                encoder.encode(signUpDTO.getPassword()),
+                signUpDTO.getAddress()
         );
 
         //default signIn record as User

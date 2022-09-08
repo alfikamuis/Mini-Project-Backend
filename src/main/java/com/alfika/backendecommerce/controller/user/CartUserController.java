@@ -1,6 +1,7 @@
 package com.alfika.backendecommerce.controller.user;
 
 import com.alfika.backendecommerce.model.Cart;
+import com.alfika.backendecommerce.model.OrderItems;
 import com.alfika.backendecommerce.response.CartResponse;
 import com.alfika.backendecommerce.response.OrderItemsResponse;
 import com.alfika.backendecommerce.service.UserService;
@@ -8,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 
@@ -29,7 +32,8 @@ public class CartUserController {
     }
 
     @GetMapping("/update-cart")
-    public ResponseEntity<?> updateCart( @RequestParam("id") Long id, @RequestParam("quantity")int quantity,
+    public ResponseEntity<?> updateCart(
+            @RequestParam("id") Long id, @RequestParam("quantity")int quantity,
             Principal currentUser){
 
         List<Cart> carts = userService.updateQuantityInCart(id,quantity,currentUser);
@@ -38,7 +42,8 @@ public class CartUserController {
     }
 
     @GetMapping("/add-to-cart")
-    public ResponseEntity<?> addProductToCart(@RequestParam("id") Long id, @RequestParam("quantity") int quantity,
+    public ResponseEntity<?> addProductToCart(
+            @RequestParam("id") Long id, @RequestParam("quantity") int quantity,
             Principal currentUser) {
 
         return userService.addProductToCart(id,quantity,currentUser);
@@ -55,8 +60,12 @@ public class CartUserController {
 
     @GetMapping("/order_items")
     public ResponseEntity<?> orderedItems(Principal currentUser){
-        userService.orderApprovedByUser(currentUser);
+        OrderItems orderItems  = userService.orderApprovedByUser(currentUser);
+
+        if (orderItems.getTotalCost() == 0){
+            return ResponseEntity.ok(new OrderItemsResponse("your cart empty"));
+        }
         return ResponseEntity.ok(new OrderItemsResponse(
-                "Shipping out your order, check status regularly"));
+                "Shipping out your order, check status regularly", orderItems));
     }
 }

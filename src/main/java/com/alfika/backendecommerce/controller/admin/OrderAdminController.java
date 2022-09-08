@@ -28,14 +28,20 @@ public class OrderAdminController {
         ));
     }
 
-    @GetMapping("/view-pending-order")
-    public ResponseEntity<?> updatePendingOrder(
-            @RequestParam(name="id") Long id,
-            @RequestParam(name="status") String status)
+    @GetMapping("/view-status-order")
+    public ResponseEntity<?> viewPendingOrder(
+            @RequestParam(name="status",defaultValue = "pending") String status)
     {
-        List<OrderItems> orderItems = adminService.updateStatusPendingOrder(id,status);
+        List<OrderItems> orderItems;
+        if (status.equalsIgnoreCase("pending"))
+        {
+            orderItems = adminService.viewAllPendingOrderByUser();
+            return ResponseEntity.ok(new OrderItemsResponse(
+                    "list of status pending orders", orderItems));
+        }
+        orderItems = adminService.viewAllShippingOrderByUser();
         return ResponseEntity.ok(new OrderItemsResponse(
-                "status order id: "+ id +" has been updated", orderItems));
+                "list if status shipping orders", orderItems));
     }
 
     @PostMapping("/update-order")

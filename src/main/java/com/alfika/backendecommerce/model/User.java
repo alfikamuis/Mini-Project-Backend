@@ -38,7 +38,7 @@ public class User {
     private String address;
 
     //making separate table for user_id and role_id
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn (name="user_id"),
