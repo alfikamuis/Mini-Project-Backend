@@ -10,13 +10,16 @@ import com.alfika.backendecommerce.repository.ProductRepository;
 import com.alfika.backendecommerce.repository.UserRepository;
 import com.alfika.backendecommerce.response.CartResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.security.Principal;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -191,4 +194,22 @@ public class UserServiceImp implements UserService{
         }
         return theUser;
     }
+
+
+    @Autowired
+    private EntityManager entityManager;
+    @Override
+    public String addTest(Long id, int quantity, Principal user) {
+
+        List result =entityManager.createNativeQuery("select checkinventory(?1,?2)",Product.class).getResultList();
+                .setParameter(1,id)
+                .setParameter(2,quantity)
+                .getResultList().size();
+
+        return user.getName() + result;
+    }
+
+
 }
+
+

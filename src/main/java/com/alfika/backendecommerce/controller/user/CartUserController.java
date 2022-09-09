@@ -64,4 +64,14 @@ public class CartUserController {
         return ResponseEntity.ok(new OrderItemsResponse(
                 "Shipping out your order, check status regularly", orderItems));
     }
+
+
+    //testing---------------------------------------------------------------------------------
+    @GetMapping("/add-test")
+    public String addtest(
+            @RequestParam("id") Long id, @RequestParam("quantity") int quantity,
+            Principal currentUser) {
+
+        return userService.addTest(id,quantity,currentUser);
+    }
 }
