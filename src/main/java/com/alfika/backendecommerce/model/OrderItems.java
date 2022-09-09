@@ -1,5 +1,6 @@
 package com.alfika.backendecommerce.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,7 +19,7 @@ import java.util.Date;
 public class OrderItems {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @NotNull
@@ -26,6 +27,8 @@ public class OrderItems {
 
     @NotNull
     private String orderStatus;
+
+    @JsonFormat(pattern="dd/MM/yyyy_HH:mm:ss")
     private Date orderDate;
     private double totalCost;
 

@@ -12,11 +12,14 @@ public interface CartRepository extends JpaRepository<Cart,Long> {
 
     List<Cart> findAllById(Long Id);
     List<Cart> findByEmail(String email);
-    boolean existsById(Long productId);
+    List<Cart> findByEmailAndStatusTrue(String email);
+    boolean existsByProductIdAndStatusTrue(Long productId);
     Optional<Cart> findById(Long id);
     Cart findById(int id);
     Cart findByIdAndEmail(Long id,String email);
+    Cart findByIdAndEmailAndStatus(Long id,String email,boolean status);
     void deleteByIdAndEmail(Long id,String email);
     List<Cart> findAllByEmail(String email);
+    List<Cart> findByOrderId(Long id);
 
 }

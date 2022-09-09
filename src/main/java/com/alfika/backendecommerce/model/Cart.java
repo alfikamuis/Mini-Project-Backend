@@ -14,8 +14,8 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "order_item")
-public class Cart implements Serializable{
+@Table(name = "cart")
+public class Cart{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,20 +23,18 @@ public class Cart implements Serializable{
 
     @Column(name = "order_id",nullable = true)
     private Long orderId;
-
     private String email;
-
     private String name;
-
     private int quantity;
-
     private double price;
 
-    @Column(name = "created_at")
-    private Date createdAt;
+    @Column(name = "status")
+    private boolean status = true;
 
     // one to many
     @Column(name = "product_id")
     private Long productId;
 
+    @Column(name = "created_at")
+    private Date createdAt;
 }
