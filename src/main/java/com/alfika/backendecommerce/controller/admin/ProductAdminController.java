@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-
 @RestController
 @RequestMapping("/api/admin")
 //@CrossOrigin(origins = "*")
@@ -26,7 +25,6 @@ public class ProductAdminController {
     public ResponseEntity<?> getProducts(){
         return ResponseEntity.ok(new ProductResponse(
                 "Products find",
-                adminService.findAllProduct()
         ));
     }
 
@@ -58,6 +56,7 @@ public class ProductAdminController {
     ) throws IOException{
 
         Product product = adminService.updateProduct(id,name,description,stock,price,imageUrl );
+
         return ResponseEntity.ok(new ProductResponse(
                 "update product id:" + id, product));
     }
@@ -68,6 +67,7 @@ public class ProductAdminController {
         adminService.deleteProduct(id);
         return ResponseEntity.ok(new ProductResponse(
                 "Delete Product id:"+ id, adminService.findAllProduct()
+
         ));
     }
 

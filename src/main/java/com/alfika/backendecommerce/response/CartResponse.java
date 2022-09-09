@@ -21,6 +21,4 @@ public class CartResponse {
         this.message = message;
         this.carts = carts;
     }
-
-
 }

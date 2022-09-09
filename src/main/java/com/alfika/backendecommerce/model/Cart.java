@@ -30,11 +30,11 @@ public class Cart{
 
     @Column(name = "status")
     private boolean status = true;
+
     // one to many
     @Column(name = "product_id")
     private Long productId;
 
     @Column(name = "created_at")
     private Date createdAt;
-
 }
