@@ -1,6 +1,5 @@
 package com.alfika.backendecommerce.controller.user;
 
-import com.alfika.backendecommerce.model.Cart;
 import com.alfika.backendecommerce.model.OrderItems;
 import com.alfika.backendecommerce.response.CartResponse;
 import com.alfika.backendecommerce.response.OrderItemsResponse;
@@ -9,12 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -66,9 +62,9 @@ public class CartUserController {
     }
 
 
-    //testing---------------------------------------------------------------------------------
+    //test---------------------------------------------------------------------------------
     @GetMapping("/add-test")
-    public String addtest(
+    public Object addtest(
             @RequestParam("id") Long id, @RequestParam("quantity") int quantity,
             Principal currentUser) {
 

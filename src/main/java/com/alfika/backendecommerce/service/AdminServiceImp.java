@@ -38,7 +38,6 @@ public class AdminServiceImp implements AdminService {
         List<ViewOrder> viewOrdersArr = new ArrayList<>();
         List<OrderItems> orderItems = orderItemsRepository.findAll(); //fetch data from order_items db
 
-
         orderItems.forEach((items) ->{
             ViewOrder toViewOrder = new ViewOrder();
             toViewOrder.setOrderId(items.getId());
