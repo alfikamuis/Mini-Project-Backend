@@ -6,12 +6,13 @@ import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public interface UserService {
 
     List<Cart> viewCartUser (Principal user);
     ResponseEntity<?> updateQuantityInCart (Long id,int quantity,Principal user);
-    ResponseEntity<?> addProductToCart (Long id, int quantity, Principal user);
+    ResponseEntity<?> addProductToCart (Long id, int quantity, Principal user) throws ExecutionException, InterruptedException;
     ResponseEntity<?> deleteProductInCart (Long id,Principal user);
     OrderItems orderApprovedByUser (Principal user);
 

@@ -30,7 +30,6 @@ public class Consumer {
         logger.info("promo notification received from admin"+ message);
         return new ResponseEntity<>("info: "+message.getMessages(), HttpStatus.OK);
     }
-
      */
     @GetMapping("/check-promo")
     @RabbitListener(queues = "regular.user")

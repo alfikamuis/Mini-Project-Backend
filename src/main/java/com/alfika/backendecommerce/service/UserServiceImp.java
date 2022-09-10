@@ -9,11 +9,12 @@ import com.alfika.backendecommerce.repository.OrderItemsRepository;
 import com.alfika.backendecommerce.repository.ProductRepository;
 import com.alfika.backendecommerce.repository.UserRepository;
 import com.alfika.backendecommerce.response.CartResponse;
+import com.alfika.backendecommerce.service.websocket.ServerWebSocketService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
@@ -21,8 +22,8 @@ import javax.persistence.StoredProcedureQuery;
 import java.security.Principal;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class UserServiceImp implements UserService{
@@ -37,6 +38,9 @@ public class UserServiceImp implements UserService{
     private ProductRepository productRepository;
     @Autowired
     private OrderItemsRepository orderItemsRepository;
+
+    @Autowired
+    private ServerWebSocketService serverWebSocketService;
 
     @Override
     public List<Cart> viewCartUser(Principal currentUser) {
@@ -78,8 +82,9 @@ public class UserServiceImp implements UserService{
 
     //--------------------------------------------------------------------add cart-----------
 
+    @Transactional
     @Override
-    public ResponseEntity<?> addProductToCart(Long id, int quantity, Principal currentUser) {
+    public ResponseEntity<?> addProductToCart(Long id, int quantity, Principal currentUser) throws ExecutionException, InterruptedException {
 
         if(!productRepository.findById(id).isPresent()){
             return ResponseEntity.badRequest().body(new CartResponse("product by id not found!"));
@@ -99,6 +104,11 @@ public class UserServiceImp implements UserService{
         if(check - quantity <= 0 || quantity > check){
             return ResponseEntity.badRequest().body(new CartResponse("stock product not available!"));
         }
+        try {
+            serverWebSocketService.webSocketConnect(currentUser,"buy", product.getName(),quantity);
+        } catch (Error e){
+        }
+
         updateInventory(id,product.getUnitStock() - quantity);
 
         //checking the product details

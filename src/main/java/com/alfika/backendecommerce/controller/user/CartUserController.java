@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/user")
@@ -38,7 +39,7 @@ public class CartUserController {
     @GetMapping("/add-to-cart")
     public ResponseEntity<?> addProductToCart(
             @RequestParam("id") Long id, @RequestParam("quantity") int quantity,
-            Principal currentUser) {
+            Principal currentUser) throws ExecutionException, InterruptedException {
 
         return userService.addProductToCart(id,quantity,currentUser);
     }

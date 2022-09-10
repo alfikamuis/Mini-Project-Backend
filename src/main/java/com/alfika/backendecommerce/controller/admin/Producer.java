@@ -39,4 +39,5 @@ public class Producer {
         logger.info(principal.getName()+" Sending messages - "+message.getMessages()+" to regular user");
         return new ResponseEntity<>("send "+message.getMessages()+" notification",HttpStatus.OK);
     }
+
 }

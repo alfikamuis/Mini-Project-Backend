@@ -14,4 +14,8 @@ public class Message {
     private String sender;
     private String messages;
 
+    public Message(@Nullable String sender, String messages) {
+        this.sender = sender;
+        this.messages = messages;
+    }
 }
