@@ -9,19 +9,28 @@ import com.alfika.backendecommerce.repository.OrderItemsRepository;
 import com.alfika.backendecommerce.repository.ProductRepository;
 import com.alfika.backendecommerce.repository.UserRepository;
 import com.alfika.backendecommerce.response.CartResponse;
+import com.alfika.backendecommerce.service.websocket.ServerWebSocketService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class UserServiceImp implements UserService{
 
+    @Autowired
+    private EntityManager entityManager;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -30,6 +39,9 @@ public class UserServiceImp implements UserService{
     private ProductRepository productRepository;
     @Autowired
     private OrderItemsRepository orderItemsRepository;
+
+    @Autowired
+    private ServerWebSocketService serverWebSocketService;
 
     @Override
     public List<Cart> viewCartUser(Principal currentUser) {
@@ -50,18 +62,15 @@ public class UserServiceImp implements UserService{
         Cart cart = cartRepository.findByIdAndEmail(id, user.getEmail());
 
         //change quantity
-        Optional<Product> fetchProduct = productRepository.findById(cart.getProductId());
-        Product product = fetchProduct.get();
-        //check if the condition meets the quantity of product
-        if( product.getUnitStock() - quantity < 0|| quantity > product.getUnitStock()){
+        int check = checkInventory(cart.getProductId());
+        if( check - quantity < 0|| quantity > check){
             return ResponseEntity.badRequest().body(new CartResponse("stock product not available!"));
         }
         if(cart.getQuantity() < quantity){
-            product.setUnitStock(product.getUnitStock() - (quantity- cart.getQuantity()));
+            updateInventory(cart.getProductId(),check - (quantity - cart.getQuantity()) );
         } else {
-            product.setUnitStock(product.getUnitStock() + (cart.getQuantity()-quantity));
+            updateInventory(cart.getProductId(),check + (quantity - cart.getQuantity()) );
         }
-        productRepository.save(product);
 
         cart.setPrice(cart.getPrice());
         cart.setQuantity(quantity);
@@ -74,8 +83,9 @@ public class UserServiceImp implements UserService{
 
     //--------------------------------------------------------------------add cart-----------
 
+    @Transactional
     @Override
-    public ResponseEntity<?> addProductToCart(Long id, int quantity, Principal currentUser) {
+    public ResponseEntity<?> addProductToCart(Long id, int quantity, Principal currentUser) throws ExecutionException, InterruptedException {
 
         if(!productRepository.findById(id).isPresent()){
             return ResponseEntity.badRequest().body(new CartResponse("product by id not found!"));
@@ -90,14 +100,20 @@ public class UserServiceImp implements UserService{
             return ResponseEntity.badRequest().body(new CartResponse("duplicate item, please update quantity"));
         }
 
-        //int inventory = productRepository.checkInventory(id,quantity);
         //check if the condition meets the quantity of product
-        if( product.getUnitStock() - quantity < 0|| quantity > product.getUnitStock()){
+        int check = checkInventory(id);
+        if(check - quantity <= 0 || quantity > check){
             return ResponseEntity.badRequest().body(new CartResponse("stock product not available!"));
         }
 
-        product.setUnitStock(product.getUnitStock() - quantity);
-        productRepository.save(product);
+        //try websocket
+        try {
+            serverWebSocketService.webSocketConnect(currentUser,"buy", product.getName(),quantity);
+        } catch (Error e){
+            return ResponseEntity.badRequest().body(new CartResponse("websocket error!"));
+        }
+
+        updateInventory(id,product.getUnitStock() - quantity);
 
         //checking the product details
         Cart cart = new Cart();
@@ -128,10 +144,8 @@ public class UserServiceImp implements UserService{
         Cart cart = fetchCart.get();
 
         //return quantity
-        Optional<Product> fetchProduct = productRepository.findById(cart.getProductId());
-        Product product = fetchProduct.get();
-        product.setUnitStock(product.getUnitStock() + cart.getQuantity());
-        productRepository.save(product);
+        int quantity = checkInventory(cart.getProductId());
+        updateInventory(cart.getProductId(),quantity + cart.getQuantity());
 
         //return quantity to the db and delete it
         //productRepository.addInventoryFromCart(cart.getProductId(), cart.getQuantity());
@@ -154,7 +168,7 @@ public class UserServiceImp implements UserService{
         orderItems.setOrderStatus("pending");
 
         //save the order's date
-        Date date = new Date();
+        LocalDate date = LocalDate.now();
         orderItems.setOrderDate(date);
 
         //sum total by findAll product in cart
@@ -191,4 +205,36 @@ public class UserServiceImp implements UserService{
         }
         return theUser;
     }
+
+    //trial section-------------------------------------------------------------------------------------
+
+    public int checkInventory(Long id){
+        Object result = entityManager.createNativeQuery("select unit_stock from products where id = (?1)")
+                .setParameter(1,id)
+                .getSingleResult();
+        return (int) result;
+    }
+
+    public void updateInventory(Long id,int quantity){
+        entityManager.createNativeQuery("update products set unit_stock =(?2) where id = (?1)")
+                .setParameter(1,id)
+                .setParameter(2,quantity);
+    }
+
+    @Override
+    public Object addTest(Long id, int quantity, Principal user) {
+
+        StoredProcedureQuery query = entityManager
+                .createStoredProcedureQuery("selectunit")
+                .registerStoredProcedureParameter(1,
+                        Long.class, ParameterMode.IN)
+                .setParameter(1, id);
+
+        query.getResultList();
+        return query.getResultList();
+    }
+
+
 }
+
+

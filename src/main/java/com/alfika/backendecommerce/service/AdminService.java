@@ -17,19 +17,10 @@ public interface AdminService {
     List<OrderItems> viewAllPendingOrderByUser();
     ResponseEntity<?> updateStatusOrder (Long id, String message);
     List<OrderItems> updateStatusPendingOrder (Long id,String message);
-    Product addProduct(
-            String name,
-            String description,
-            String stock,
-            String price,
+    Product addProduct(String name, String description, String stock, String price,
             MultipartFile image) throws IOException;
 
-    Product updateProduct(
-            Long id,
-            String name,
-            String description,
-            String stock,
-            String price,
+    Product updateProduct(Long id, String name, String description, String stock, String price,
             MultipartFile image) throws IOException;
 
     void deleteProduct(Long id);

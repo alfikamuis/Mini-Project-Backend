@@ -1,6 +1,5 @@
 package com.alfika.backendecommerce.controller.user;
 
-import com.alfika.backendecommerce.model.Cart;
 import com.alfika.backendecommerce.model.OrderItems;
 import com.alfika.backendecommerce.response.CartResponse;
 import com.alfika.backendecommerce.response.OrderItemsResponse;
@@ -9,12 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.security.Principal;
-import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/user")
@@ -42,7 +39,7 @@ public class CartUserController {
     @GetMapping("/add-to-cart")
     public ResponseEntity<?> addProductToCart(
             @RequestParam("id") Long id, @RequestParam("quantity") int quantity,
-            Principal currentUser) {
+            Principal currentUser) throws ExecutionException, InterruptedException {
 
         return userService.addProductToCart(id,quantity,currentUser);
     }
@@ -64,5 +61,15 @@ public class CartUserController {
         return ResponseEntity.ok(new OrderItemsResponse(
                 "Shipping out your order, check status regularly", orderItems));
 
+    }
+
+
+    //test---------------------------------------------------------------------------------
+    @GetMapping("/add-test")
+    public Object addtest(
+            @RequestParam("id") Long id, @RequestParam("quantity") int quantity,
+            Principal currentUser) {
+
+        return userService.addTest(id,quantity,currentUser);
     }
 }
