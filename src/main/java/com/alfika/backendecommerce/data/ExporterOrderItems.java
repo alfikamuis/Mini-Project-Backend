@@ -43,7 +43,6 @@ public class ExporterOrderItems {
         createCell(row,2,"total_cost",style);
         createCell(row,3,"status_order",style);
         createCell(row,4,"date_order",style);
-
     }
 
     private void createCell(Row row, int columnCount, Object value, CellStyle style) {

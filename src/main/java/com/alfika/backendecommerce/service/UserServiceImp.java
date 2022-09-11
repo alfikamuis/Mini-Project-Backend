@@ -20,6 +20,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -104,9 +105,12 @@ public class UserServiceImp implements UserService{
         if(check - quantity <= 0 || quantity > check){
             return ResponseEntity.badRequest().body(new CartResponse("stock product not available!"));
         }
+
+        //try websocket
         try {
             serverWebSocketService.webSocketConnect(currentUser,"buy", product.getName(),quantity);
         } catch (Error e){
+            return ResponseEntity.badRequest().body(new CartResponse("websocket error!"));
         }
 
         updateInventory(id,product.getUnitStock() - quantity);
@@ -164,7 +168,7 @@ public class UserServiceImp implements UserService{
         orderItems.setOrderStatus("pending");
 
         //save the order's date
-        Date date = new Date();
+        LocalDate date = LocalDate.now();
         orderItems.setOrderDate(date);
 
         //sum total by findAll product in cart
